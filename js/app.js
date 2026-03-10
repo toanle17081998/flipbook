@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, {passive: true});
 
         bookEl.addEventListener('touchend', (e) => {
-            if (!pageFlipLib || pageFlipLib.getFlipState() !== 'read') return;
+            if (!pageFlipLib || pageFlipLib.getState() !== 'read') return;
             
             const touchEndX = e.changedTouches[0].screenX;
             const touchEndY = e.changedTouches[0].screenY;
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Click bình thường giữ lại cho chuột PC
         bookEl.addEventListener('click', (e) => {
             if (e.pointerType === 'touch') return; // Mobile thì xử lý ở trên rồi
-            if (!pageFlipLib || pageFlipLib.getFlipState() !== 'read') return;
+            if (!pageFlipLib || pageFlipLib.getState() !== 'read') return;
             
             const rect = bookEl.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
