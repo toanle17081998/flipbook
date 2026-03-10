@@ -212,7 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileScrollSupport: false, 
             usePortrait: true, // Bắt buộc portrait nếu màn hình cha (container) nhỏ hơn 2 page. Giúp force 1 page mode
             flippingTime: 400, // Tăng tốc độ lật trang (Giảm từ 800 xuống 400ms)
-            swipeDistance: 15 // Tăng độ nhạy chạm vuốt (Giảm quãng đường phải vuốt trên Mobile)
+            swipeDistance: 15, // Tăng độ nhạy chạm vuốt (Giảm quãng đường phải vuốt trên Mobile)
+            useMouseEvents: true, // Cho phép dùng chuột tương tác
+            clickEventForward: true // Cho phép chạm vào mép màn hình để lật (Click to flip)
         });
 
         // Nạp HTML từ DOM
@@ -225,6 +227,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 pageFlipLib.flipNext(); // Qua trang
             } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
                 pageFlipLib.flipPrev(); // Lùi trang
+            }
+        });
+
+        // Bổ sung: Bắt sự kiện chạm click thủ công (nếu cấu hình thư viện gặp lỗi trên iOS)
+        bookEl.addEventListener('click', (e) => {
+            if (!pageFlipLib || pageFlipLib.getFlipState() !== 'read') return;
+            
+            // Tìm tọa độ chạm
+            const rect = bookEl.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            
+            // Chia đôi màn hình: Chạm nửa bên trái => Lùi, Chạm nửa bên phải => Tới
+            if (clickX < rect.width / 2) {
+                pageFlipLib.flipPrev();
+            } else {
+                pageFlipLib.flipNext();
             }
         });
 
