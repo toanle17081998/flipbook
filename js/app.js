@@ -187,11 +187,22 @@ document.addEventListener('DOMContentLoaded', function() {
             showCover: true,
             mobileScrollSupport: false, 
             usePortrait: true, // Bắt buộc portrait nếu màn hình cha (container) nhỏ hơn 2 page. Giúp force 1 page mode
-            flippingTime: 800 // Tốc độ lật chậm hơn 1 chút để tạo cảm giác giấy thật
+            flippingTime: 400, // Tăng tốc độ lật trang (Giảm từ 800 xuống 400ms)
+            swipeDistance: 15 // Tăng độ nhạy chạm vuốt (Giảm quãng đường phải vuốt trên Mobile)
         });
 
         // Nạp HTML từ DOM
         pageFlipLib.loadFromHTML(document.querySelectorAll('.page'));
+
+        // Cấu hình phím mũi tên lật sách trên Desktop
+        document.addEventListener("keydown", (e) => {
+            if (!pageFlipLib) return;
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                pageFlipLib.flipNext(); // Qua trang
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                pageFlipLib.flipPrev(); // Lùi trang
+            }
+        });
 
         // Sự kiện: Khi người dùng đang lật trang
         pageFlipLib.on('flip', (e) => {
