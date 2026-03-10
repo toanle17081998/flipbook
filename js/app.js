@@ -153,13 +153,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const isMobile = window.innerWidth <= 800;
 
         pageFlipLib = new window.St.PageFlip(bookEl, {
-            width: isMobile ? 320 : 400, // Chiều rộng 1 trang cơ bản (thu nhỏ cho mobile)
-            height: isMobile ? 480 : 500, // Chiều cao 1 trang cơ bản
+            width: isMobile ? 320 : 400, // Chiều rộng 1 trang cơ bản
+            height: isMobile ? 454 : 567, // Chiều cao 1 trang cơ bản (Chuẩn tỷ lệ A4 ~ 1:1.417 của PDF)
             size: "stretch", // Cho phép co dãn theo khung cha
             minWidth: 280,
             maxWidth: 500,
-            minHeight: 380,
-            maxHeight: 650,
+            minHeight: 396,
+            maxHeight: 708,
             maxShadowOpacity: 0.8, // Tăng cường độ đổ bóng để giống sách hơn
             showCover: true,
             mobileScrollSupport: false, 
