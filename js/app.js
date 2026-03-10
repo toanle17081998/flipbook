@@ -62,14 +62,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Tua nhạc
-            progressContainer.addEventListener('click', (e) => {
+            // Tua nhạc (hỗ trợ cả Click chuột và Touch trên Mobile)
+            const handleSeek = (e) => {
                 if (!currentAudio) return;
-                const width = progressContainer.clientWidth;
-                const clickX = e.offsetX;
+                
+                // Lấy tọa độ bounding box của thanh progress
+                const rect = progressContainer.getBoundingClientRect();
+                
+                // Phân biệt Touch Event và Mouse Event
+                let clientX;
+                if (e.type.startsWith('touch')) {
+                    clientX = e.changedTouches[0].clientX;
+                } else {
+                    clientX = e.clientX;
+                }
+
+                // Tính toán vị trí tương đối
+                const clickX = clientX - rect.left;
+                const width = rect.width;
+                
+                // Tránh giá trị âm hoặc lố ra ngoài do ngón tay chạm lem
+                const boundedX = Math.max(0, Math.min(clickX, width));
+
                 const duration = currentAudio.duration;
-                currentAudio.currentTime = (clickX / width) * duration;
-            });
+                if (!isNaN(duration)) {
+                    currentAudio.currentTime = (boundedX / width) * duration;
+                }
+            };
+
+            progressContainer.addEventListener('mousedown', handleSeek);
+            progressContainer.addEventListener('touchstart', handleSeek, {passive: true});
+
         },
 
         playSpread(pageIndices) {

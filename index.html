@@ -28,16 +28,16 @@
         <!-- The Book -->
         <div class="flip-book" id="flip-book">
             <!-- Hardcover Front -->
-            <div class="page page-cover page-cover-top" data-density="hard">
+            <!-- <div class="page page-cover page-cover-top" data-density="hard">
                 <div class="page-content">
                     <h2 class="book-title">Tình Yêu Nào</h2>
                     <p class="book-subtitle">Vuốt hoặc Click để mở</p>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- Page 1 (Image from PDF) -->
-            <div class="page" data-audio="assets/audio/page-2.mp3"> <!-- Xóa data-density="hard" để giấy mềm -->
+            <div class="page" data-density="hard"> <!-- Xóa data-density="hard" để giấy mềm -->
                 <div class="page-content">
                     <div class="page-image" style="background-image: url('assets/images/page-1.jpg');"></div>
                     <div class="page-number">1</div>
@@ -237,7 +237,7 @@
             </div>
 
             <!-- Page 26 (Image from PDF) -->
-            <div class="page" data-audio="assets/audio/page-3.mp3"> <!-- Xóa data-density="hard" để giấy mềm -->
+            <div class="page" data-density="hard"> <!-- Xóa data-density="hard" để giấy mềm -->
                 <div class="page-content">
                     <div class="page-image" style="background-image: url('assets/images/page-26.jpg');"></div>
                     <div class="page-number">26</div>
@@ -246,15 +246,15 @@
 
 
             <!-- Hardcover Back -->
-            <div class="page page-cover page-cover-bottom" data-density="hard">
+            <!-- <div class="page page-cover page-cover-bottom" data-density="hard">
                 <div class="page-content">
                     <h2>Hết</h2>
                 </div>
-            </div>
+            </div> -->
         </div>
         
         <!-- Glassmorphism Audio Player -->
-        <div class="audio-player" id="audio-player">
+        <div class="audio-player" id="audio-player" style="display: none;">
             <div class="player-info">
                 <span id="player-status" class="status-icon">♪</span>
                 <span id="player-track">Đang phát audio trang...</span>
