@@ -28,43 +28,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 3. Audio Controller
     const audioController = {
-        audios: {}, // Chứa danh sách đối tượng Audio. Key là index trang
+        player: new Audio(), // SỬ DỤNG DUY NHẤT 1 THẺ AUDIO (Tránh iOS phát chồng chéo)
+        tracks: {}, // Lưu trữ đường dẫn audio của từng trang: { index: "src" }
         queue: [], // Hàng đợi các trang cần phát nhạc
         
         init() {
             // Quét tất cả page có thuộc tính data-audio
             const pages = document.querySelectorAll('.page[data-audio]');
-            pages.forEach((page, index) => {
+            pages.forEach((page) => {
                 const src = page.getAttribute('data-audio');
                 const pageIndex = Array.from(page.parentNode.children).indexOf(page);
                 
                 if (src) {
-                    const audio = new Audio(src);
-                    audio.addEventListener('timeupdate', this.updateUI.bind(this));
-                    audio.addEventListener('ended', () => {
-                        playPauseBtn.textContent = '▶️';
-                        // Tiếp tục gọi bài tiếp theo trong hàng đợi
-                        this.playNextInQueue();
-                    });
-                    this.audios[pageIndex] = audio;
+                    this.tracks[pageIndex] = src; // Ghi nhớ URL bài hát thay vì ôm thẻ Audio lớn
                 }
+            });
+
+            // Gắn event timeupdate cho giao diện
+            this.player.addEventListener('timeupdate', this.updateUI.bind(this));
+            
+            // Khi hát xong thì tự lôi bài trong hàng đợi ra (nếu Desktop mở 2 trang), xong hết thì lật
+            this.player.addEventListener('ended', () => {
+                playPauseBtn.textContent = '▶️';
+                this.playNextInQueue();
             });
 
             // Gắn sự kiện vô event click cho nút Play/Pause
             playPauseBtn.addEventListener('click', () => {
-                if (!currentAudio) return;
-                if (currentAudio.paused) {
-                    currentAudio.play().catch(e => console.log('Wait for user interaction'));
+                if (!this.player.src) return; // Chưa load bài nào thì bỏ qua
+                if (this.player.paused) {
+                    this.player.play().catch(e => console.log('Wait for user interaction'));
                     playPauseBtn.textContent = '⏸️';
                 } else {
-                    currentAudio.pause();
+                    this.player.pause();
                     playPauseBtn.textContent = '▶️';
                 }
             });
 
             // Tua nhạc (hỗ trợ cả Click chuột và Touch trên Mobile)
             const handleSeek = (e) => {
-                if (!currentAudio) return;
+                if (!this.player.src) return;
                 
                 // Lấy tọa độ bounding box của thanh progress
                 const rect = progressContainer.getBoundingClientRect();
@@ -84,9 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Tránh giá trị âm hoặc lố ra ngoài do ngón tay chạm lem
                 const boundedX = Math.max(0, Math.min(clickX, width));
 
-                const duration = currentAudio.duration;
+                const duration = this.player.duration;
                 if (!isNaN(duration)) {
-                    currentAudio.currentTime = (boundedX / width) * duration;
+                    this.player.currentTime = (boundedX / width) * duration;
                 }
             };
 
@@ -96,15 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         playSpread(pageIndices) {
-            // Dừng nhạc cũ
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-                currentAudio = null;
-            }
+            // Dừng hẳn nhạc
+            this.player.pause();
+            this.player.currentTime = 0;
 
-            // Xây dựng hàng đợi chỉ chứa các trang có khai báo audio
-            this.queue = pageIndices.filter(index => this.audios[index] !== undefined);
+            // Xây dựng hàng đợi chỉ chứa các file MP3 có trong các bề trang đang hiện diện
+            this.queue = pageIndices.filter(index => this.tracks[index] !== undefined);
 
             if (this.queue.length > 0) {
                 this.playNextInQueue(true);
@@ -117,9 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
         playNextInQueue(isFirst = false) {
             if (this.queue.length > 0) {
                 const nextPage = this.queue.shift();
-                currentAudio = this.audios[nextPage];
+                
+                // Tráo đuôi file bài hát mới cho Loa và Hát lại từ đầu
+                this.player.src = this.tracks[nextPage];
+                this.player.load();
+                
                 if (isUserActive) {
-                    const playPromise = currentAudio.play();
+                    const playPromise = this.player.play();
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
                             playPauseBtn.textContent = '⏸️';
@@ -142,9 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         updateUI() {
-            if (!currentAudio) return;
-            const currentTime = currentAudio.currentTime;
-            const duration = currentAudio.duration;
+            if (!this.player.src) return;
+            const currentTime = this.player.currentTime;
+            const duration = this.player.duration;
             
             if (duration > 0) {
                 const percent = (currentTime / duration) * 100;
@@ -157,26 +161,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Khởi tạo AudioController
     audioController.init();
 
-    // Hàm Unlock Audio cho iPhone / Mobile: Phải play/pause toàn bộ thẻ âm thanh trong event tương tác ĐẦU TIÊN
-    // Nếu không đợi tới lúc lật trang, Safari iOS sẽ chặn việc play() vì không sinh ra trực tiếp bởi DOM Event chạm tay
+    // Hàm Unlock Audio cho iPhone / Mobile cực mượt: (Phát 1 tick câm base64 cực ngắn)
+    // Nếu tạo 26 thẻ rồi gọi Play đồng loạt như cũ, iPhone sẽ xé nhạc thành nhiều luồng, làm sập trình duyệt gây dội âm!
     function unlockAudioForMobile() {
         if (isUserActive) return; // Chỉ chạy 1 lần
         
-        // Xin quyền phát cho TẤT CẢ các file âm thanh đã được load (dù chưa lật tới)
-        for (const index in audioController.audios) {
-            const tempAudio = audioController.audios[index];
-            tempAudio.muted = true; // Mute tránh tiếng bùm chíu 
-            const p = tempAudio.play();
-            if (p !== undefined) {
-                p.then(() => {
-                    tempAudio.pause();
-                    tempAudio.currentTime = 0;
-                    tempAudio.muted = false; // Mở âm lại cho lần phát chính thức
-                }).catch(err => {
-                    tempAudio.muted = false;
-                    console.log("Audio unlock failed for index", index, err);
-                });
-            }
+        // Cấp chứng chỉ hoạt động bằng một file khoảng trắng cực ngắn để Browser an lòng
+        audioController.player.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+        const p = audioController.player.play();
+        if (p !== undefined) {
+            p.then(() => {
+                // Thành công
+                audioController.player.pause();
+            }).catch(err => {
+                console.log("Audio silent unlock failed", err);
+            });
         }
     }
 
