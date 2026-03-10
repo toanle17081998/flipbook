@@ -230,15 +230,51 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Bổ sung: Bắt sự kiện chạm click thủ công (nếu cấu hình thư viện gặp lỗi trên iOS)
-        bookEl.addEventListener('click', (e) => {
+        // Bổ sung: Bắt sự kiện Tap (Nhấp màn hình) tinh chuẩn cho thiết bị di động
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        let isSwiping = false;
+
+        bookEl.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+            touchStartTime = Date.now();
+            isSwiping = false;
+        }, {passive: true});
+
+        bookEl.addEventListener('touchmove', (e) => {
+            isSwiping = true; // Nếu tay xê dịch liên tục thì coi là đang vuốt
+        }, {passive: true});
+
+        bookEl.addEventListener('touchend', (e) => {
             if (!pageFlipLib || pageFlipLib.getFlipState() !== 'read') return;
             
-            // Tìm tọa độ chạm
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const duration = Date.now() - touchStartTime;
+
+            // Nếu chạm nhả ngắn (dưới 350ms) và không di dịch ngón tay (dưới 15px) => Đây chính là thao tác CHẠM (Tap) chứ không phải Vuốt (Swipe)
+            if (!isSwiping && duration < 350 && Math.abs(touchEndX - touchStartX) < 15 && Math.abs(touchEndY - touchStartY) < 15) {
+                const rect = bookEl.getBoundingClientRect();
+                const clickX = e.changedTouches[0].clientX - rect.left;
+                
+                // Chia đôi màn hình: Chạm nửa bên trái => Lùi, Chạm nửa bên phải => Tới
+                if (clickX < rect.width / 2) {
+                    pageFlipLib.flipPrev();
+                } else {
+                    pageFlipLib.flipNext();
+                }
+            }
+        });
+
+        // Click bình thường giữ lại cho chuột PC
+        bookEl.addEventListener('click', (e) => {
+            if (e.pointerType === 'touch') return; // Mobile thì xử lý ở trên rồi
+            if (!pageFlipLib || pageFlipLib.getFlipState() !== 'read') return;
+            
             const rect = bookEl.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
-            
-            // Chia đôi màn hình: Chạm nửa bên trái => Lùi, Chạm nửa bên phải => Tới
             if (clickX < rect.width / 2) {
                 pageFlipLib.flipPrev();
             } else {
