@@ -1,0 +1,344 @@
+/* Reset & Base Variables */
+:root {
+    --bg-color: #1a1a1d;
+    --book-width: 800px;
+    --book-height: 500px;
+    --page-bg: #fdfaf6;
+    --text-color: #333;
+    --cover-bg: #4a2e1b;
+    --cover-text: #f0e6d2;
+    --primary: #c9933f;
+    --player-bg: rgba(25, 25, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden; /* Prevent scrolling outside book */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Background Texture */
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #3a3a40 0%, #121214 100%);
+    z-index: -1;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+}
+
+/* Welcome Screen */
+.welcome-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+.welcome-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.welcome-content {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    color: white;
+    max-width: 400px;
+}
+
+.welcome-content h1 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 15px;
+    color: var(--primary);
+}
+
+.welcome-content p {
+    margin-bottom: 25px;
+    opacity: 0.8;
+}
+
+.start-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 15px rgba(201, 147, 63, 0.4);
+}
+
+.start-btn:hover {
+    transform: translateY(-2px);
+    background: #d8a353;
+}
+
+/* Book Styles */
+.flip-book {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); /* Bóng đổ dày hơn cho sách */
+    transition: transform 0.5s;
+    border-radius: 4px; /* Bo nhẹ góc toàn bộ quyển sách */
+}
+
+.page {
+    background-color: var(--page-bg);
+    overflow: hidden;
+    border: solid 1px #e8e8e8;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+}
+
+.page-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 15px; /* Giảm padding xíu cho mobile */
+}
+
+/* Image styling inside page */
+.page-image {
+    width: 100%;
+    flex-grow: 1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background-color: #ddd; /* fallback */
+    position: relative;
+}
+
+.page-image::after {
+    /* Inner shadow to make images look printed */
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    pointer-events: none;
+}
+
+.page-number {
+    text-align: center;
+    padding-top: 15px;
+    font-size: 0.9rem;
+    color: #888;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Hardcover Styles */
+.page-cover {
+    background-color: var(--cover-bg);
+    color: var(--cover-text);
+    border: solid 1px #3a2212;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.08"/></svg>');
+}
+
+.page-cover .page-content {
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    margin: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+}
+
+.book-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--primary);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.book-subtitle {
+    font-size: 1.2rem;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Shadow effects for 3D realism */
+.page.--left {
+    border-right: 0;
+    box-shadow: inset -20px 0 30px -20px rgba(0,0,0,0.2);
+}
+.page.--right {
+    border-left: 0;
+    box-shadow: inset 20px 0 30px -20px rgba(0,0,0,0.2);
+}
+
+/* Audio Player (Glassmorphism) */
+.audio-player {
+    position: absolute;
+    bottom: 30px;
+    width: 90%;
+    max-width: 600px;
+    background: var(--player-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 15px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 50;
+    transform: translateY(150%);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.audio-player.visible {
+    transform: translateY(0);
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.status-icon {
+    color: var(--primary);
+    animation: rotate 3s linear infinite;
+    display: inline-block;
+}
+
+@keyframes rotate {
+    100% { transform: rotate(360deg); }
+}
+
+.status-icon.paused {
+    animation-play-state: paused;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: var(--primary);
+    transform: scale(1.1);
+}
+
+.progress-bar-container {
+    flex-grow: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.1s linear;
+}
+
+.time-display {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    min-width: 80px;
+    text-align: right;
+    font-family: monospace;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 900px) {
+    .audio-player {
+        bottom: 15px;
+        width: 95%;
+        padding: 10px 15px; /* Thu nhỏ player chút */
+    }
+    .book-title {
+        font-size: 2.2rem;
+    }
+    .container {
+        padding: 5px 10px 100px 10px; /* Đẩy quyển sách lên cao hơn chừa chỗ cho audio player */
+    }
+    .flip-book {
+        /* Định dạng tỉ lệ giống cuốn tiểu thuyết/Sổ tay túi cho mobile */
+        max-width: 320px;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1.5; 
+        border-radius: 8px; /* Bo tròn mạnh hơn ở mobile tạo cảm giác sách nhỏ */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8), -5px 5px 15px rgba(0,0,0,0.4); 
+    }
+    .page-cover {
+        /* Che các nét viền ảo của bìa thừa */
+        border-radius: 8px;
+    }
+    /* Gáy sách ảo trên mobile (Mặc định StPageFlip hiển thị 1 trang portrait) */
+    .page.--left {
+        border-left: solid 2px rgba(0,0,0,0.3);
+    }
+}
+

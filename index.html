@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sách lật trang tương tác</title>
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Background Texture -->
+    <div class="background-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Welcome Screen (For Autoplay Policy) -->
+        <div id="welcome-screen" class="welcome-screen active">
+            <div class="welcome-content">
+                <h1>Chào mừng đến với Sách Audio</h1>
+                <p>Nhấn nút bên dưới để mở sách và cho phép phát âm thanh</p>
+                <button id="start-btn" class="start-btn">Mở sách</button>
+            </div>
+        </div>
+
+        <!-- The Book -->
+        <div class="flip-book" id="flip-book">
+            <!-- Hardcover Front -->
+            <div class="page page-cover page-cover-top" data-density="hard">
+                <div class="page-content">
+                    <h2 class="book-title">Album Kỷ Niệm</h2>
+                    <p class="book-subtitle">Vuốt hoặc Click để mở</p>
+                </div>
+            </div>
+
+            <!-- Page 1 (Audio + Image) -->
+            <div class="page" data-audio="assets/audio/page-1.mp3" data-density="hard">
+                <div class="page-content">
+                    <div class="page-image" style="background-image: url('assets/images/page-1.jpg');"></div>
+                    <div class="page-number">1</div>
+                </div>
+            </div>
+
+            <!-- Page 2 (Audio + Image) -->
+            <div class="page" data-audio="assets/audio/page-2.mp3" data-density="hard">
+                <div class="page-content">
+                    <div class="page-image" style="background-image: url('assets/images/page-2.jpg');"></div>
+                    <div class="page-number">2</div>
+                </div>
+            </div>
+
+            <!-- Page 3 (Audio + Image) -->
+            <div class="page" data-audio="assets/audio/page-3.mp3" data-density="hard">
+                <div class="page-content">
+                    <div class="page-image" style="background-image: url('assets/images/page-3.jpg');"></div>
+                    <div class="page-number">3</div>
+                </div>
+            </div>
+
+            <!-- Page 4 (Audio + Image) -->
+            <div class="page" data-audio="assets/audio/page-4.mp3" data-density="hard">
+                <div class="page-content">
+                    <div class="page-image" style="background-image: url('assets/images/page-4.jpg');"></div>
+                    <div class="page-number">4</div>
+                </div>
+            </div>
+
+            <!-- Hardcover Back -->
+            <div class="page page-cover page-cover-bottom" data-density="hard">
+                <div class="page-content">
+                    <h2>Hết</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glassmorphism Audio Player -->
+        <div class="audio-player" id="audio-player">
+            <div class="player-info">
+                <span id="player-status" class="status-icon">♪</span>
+                <span id="player-track">Đang phát audio trang...</span>
+            </div>
+            <div class="player-controls">
+                <button id="play-pause-btn" class="control-btn">⏸️</button>
+                <div class="progress-bar-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <span id="time-display" class="time-display">0:00 / 0:00</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Hidden Audio Elements (Generated dynamically in JS or put here) -->
+    <div id="audio-container"></div>
+
+    <!-- StPageFlip Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
