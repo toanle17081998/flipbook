@@ -157,8 +157,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Khởi tạo AudioController
     audioController.init();
 
+    // Hàm Unlock Audio cho iPhone / Mobile: Phải play/pause toàn bộ thẻ âm thanh trong event tương tác ĐẦU TIÊN
+    // Nếu không đợi tới lúc lật trang, Safari iOS sẽ chặn việc play() vì không sinh ra trực tiếp bởi DOM Event chạm tay
+    function unlockAudioForMobile() {
+        if (isUserActive) return; // Chỉ chạy 1 lần
+        
+        // Xin quyền phát cho TẤT CẢ các file âm thanh đã được load (dù chưa lật tới)
+        for (const index in audioController.audios) {
+            const tempAudio = audioController.audios[index];
+            tempAudio.muted = true; // Mute tránh tiếng bùm chíu 
+            const p = tempAudio.play();
+            if (p !== undefined) {
+                p.then(() => {
+                    tempAudio.pause();
+                    tempAudio.currentTime = 0;
+                    tempAudio.muted = false; // Mở âm lại cho lần phát chính thức
+                }).catch(err => {
+                    tempAudio.muted = false;
+                    console.log("Audio unlock failed for index", index, err);
+                });
+            }
+        }
+    }
+
     // 4. Bắt đầu - Mở sách
     startBtn.addEventListener('click', () => {
+        unlockAudioForMobile();
         isUserActive = true;
         welcomeScreen.classList.remove('active');
         
