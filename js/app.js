@@ -174,10 +174,19 @@ document.addEventListener('DOMContentLoaded', function() {
         pageFlipLib.on('flip', (e) => {
             const orientation = pageFlipLib.getOrientation();
             const targetPage = e.data; // e.data luôn là index trang đích được lật tới
+            const totalPages = document.querySelectorAll('.page').length;
 
             // Phát lần lượt các trang nằm trong tầm nhìn
             if (orientation === 'landscape') {
-                audioController.playSpread([targetPage, targetPage + 1]);
+                if (targetPage === 0) {
+                    // Nếu là bìa sách đóng (chỉ nhìn thấy mặt 0), không được phát nhạc mặt trong (trang 1)
+                    audioController.playSpread([0]);
+                } else if (targetPage === totalPages - 1) {
+                    // Nếu là bìa sau cùng
+                    audioController.playSpread([targetPage]);
+                } else {
+                    audioController.playSpread([targetPage, targetPage + 1]);
+                }
             } else {
                 audioController.playSpread([targetPage]);
             }
