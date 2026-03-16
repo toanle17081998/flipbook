@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentAudio = null;
     let isUserActive = false; // Phải click thì trình duyệt mới cho autoplay
     let pageFlipLib = null;
+    let backgroundAudio = null; // Nhạc nền chạy xuyên suốt
 
     // 2. Format mm:ss
     function formatTime(seconds) {
@@ -184,7 +185,15 @@ document.addEventListener('DOMContentLoaded', function() {
         unlockAudioForMobile();
         isUserActive = true;
         welcomeScreen.classList.remove('active');
-        
+
+        // Phát nhạc nền xuyên suốt (song song với âm thanh đọc sách)
+        if (!backgroundAudio) {
+            backgroundAudio = new Audio('assets/audio/bg.mp3');
+            backgroundAudio.loop = true; // Lặp lại
+            backgroundAudio.volume = 0.5; // Âm lượng 50% (nhỏ hơn âm thanh đọc sách)
+        }
+        backgroundAudio.play().catch(e => console.log('Background audio error:', e));
+
         // Khởi tạo StPageFlip nếu người dùng đã sẵn sàng
         initFlipBook();
     });

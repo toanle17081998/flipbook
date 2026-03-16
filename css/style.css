@@ -37,7 +37,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+    background: linear-gradient(135deg, #050605 0%, #0d110d 50%, #030403 100%);
     z-index: -2;
 }
 
@@ -174,7 +174,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(37, 23, 23, 0.9);
     z-index: 100;
     display: flex;
     justify-content: center;
