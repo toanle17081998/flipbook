@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isUserActive = false; // Phải click thì trình duyệt mới cho autoplay
     let pageFlipLib = null;
     let backgroundAudio = null; // Nhạc nền chạy xuyên suốt
+    let audioOnPageFlipEnabled = false; // Cờ bật/tắt audio narration khi lật trang
 
     // 2. Format mm:ss
     function formatTime(seconds) {
@@ -190,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!backgroundAudio) {
             backgroundAudio = new Audio('assets/audio/bg.mp3');
             backgroundAudio.loop = true; // Lặp lại
-            backgroundAudio.volume = 0.5; // Âm lượng 50% (nhỏ hơn âm thanh đọc sách)
+            backgroundAudio.volume = 1; // Âm lượng 50% (nhỏ hơn âm thanh đọc sách)
         }
         backgroundAudio.play().catch(e => console.log('Background audio error:', e));
 
@@ -292,6 +293,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Sự kiện: Khi người dùng đang lật trang
         pageFlipLib.on('flip', (e) => {
+            if (!audioOnPageFlipEnabled) return; // Tạm tắt audio narration khi lật
+
             const orientation = pageFlipLib.getOrientation();
             const targetPage = e.data; // e.data luôn là index trang đích được lật tới
             const totalPages = document.querySelectorAll('.page').length;
