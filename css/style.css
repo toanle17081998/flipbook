@@ -232,7 +232,7 @@ body {
 
 /* Book Styles */
 .flip-book {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); */
     /* Bóng đổ dày hơn cho sách */
     transition: transform 0.5s;
     border-radius: 4px;
